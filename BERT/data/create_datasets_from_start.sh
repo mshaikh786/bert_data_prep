@@ -27,13 +27,16 @@ python3 $SRC_DIR/data/bertPrep.py --action download --dataset mrpc
 python3 $SRC_DIR/data/bertPrep.py --action download --dataset sst-2
 
 # fix the buggy paths and modify the bertPrep.py accordingly
-
-git clone https://github.com/attardi/wikiextractor.git ${SRC_DIR}/wikiextractor
-sed -i 's/\/workspace/\${SRC_DIR}/g' bertPrep.py 
-sed -i 's/wikiextractor\/WikiExtractor.py/wikiextractor\/wikiextractor\/WikiExtractor.py/g' bertPrep.py 
- # fix the local python module "extract" path in WikiExtractor.py
-sed -i 's/from\ \.extract/from\ extract/g' wikiextractor/wikiextractor/WikiExtractor.py
-sed -i 's/bert\/create_pretraining_data.py/create_pretraining_data.py/g' bertPrep.py 
+if [ ! -d "${SRC_DIR}/wikiextractor" ] ; then
+	git clone https://github.com/attardi/wikiextractor.git ${SRC_DIR}/wikiextractor
+	sed -i 's/\/workspace/\${SRC_DIR}/g' bertPrep.py 
+	sed -i 's/wikiextractor\/WikiExtractor.py/wikiextractor\/wikiextractor\/WikiExtractor.py/g' bertPrep.py 
+ 	# fix the local python module "extract" path in WikiExtractor.py
+	sed -i 's/from\ \.extract/from\ extract/g' ${SRC_DIR}/wikiextractor/wikiextractor/WikiExtractor.py
+	sed -i 's/bert\/create_pretraining_data.py/create_pretraining_data.py/g' bertPrep.py 
+else
+	echo "wikiextractor source has already been downloaded and patched"
+fi
 
 # Properly format the text files
 if [ "$to_download" = "wiki_books" ] ; then
